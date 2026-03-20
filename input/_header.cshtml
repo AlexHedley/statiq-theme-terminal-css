@@ -1,0 +1,35 @@
+@{
+  string description = Document.WithoutSettings().GetString("Lead") ?? Document.WithoutSettings().GetString(WebKeys.Description);
+  string title = Document.GetString("Title") ?? Document.GetString("SiteTitle");
+  bool isPost = Document.GetBool("IsPost") && !Document.GetBool("IsPostArchive");
+}
+<div class="container">
+  <div class="page-header">
+    <h1>
+      @title
+      @if (Document.GetInt(Keys.Index) > 1)
+      {
+        <small>(Page @Document.GetString(Keys.Index))</small>
+      }
+    </h1>
+    @if (!string.IsNullOrEmpty(description))
+    {
+      <div class="subheading">@description</div>
+    }
+    @if (isPost)
+    {
+      <p class="post-meta">Published on @Document.GetDateTime(WebKeys.Published).ToLongDateString(Context)</p>
+      @if (Document.ContainsKey("Tags"))
+      {
+        <div class="tags">
+          @foreach (IDocument tag in Document.GetList<string>("Tags")
+            .Select(x => Outputs["tags/index.html"].First().GetChildren().FirstOrDefault(y => y.GetTitle().Equals(x, StringComparison.OrdinalIgnoreCase)))
+            .Where(x => x != null))
+          {
+            <a href="@Context.GetLink(tag)" class="badge"> @tag.GetTitle()</a>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>

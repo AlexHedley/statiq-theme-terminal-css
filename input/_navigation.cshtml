@@ -1,0 +1,18 @@
+<header class="site-header">
+  <div class="container">
+    <a class="site-title" href='@Context.GetLink("/")'>@Context.GetString("SiteTitle")</a>
+    <nav aria-label="Main navigation">
+      <ul class="site-nav">
+        @Html.Partial("_navbar")
+        @if (Context.GetBool(WebKeys.GenerateSearchIndex))
+        {
+          <li>
+            <form class="search-form" action="@Context.GetLink("/search")" method="GET" aria-label="Site search">
+              <input type="search" placeholder="Search..." aria-label="Search" name="query">
+            </form>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

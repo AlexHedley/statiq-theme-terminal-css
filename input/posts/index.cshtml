@@ -1,0 +1,52 @@
+ShowInNavbar: => GetInt("Index") <= 1
+Order: 99
+IsPostArchive: true
+Title: Posts
+ArchiveSources: => GetString("PostSources")
+ArchiveFilter: => GetBool("IsPost")
+ArchiveOrderKey: Published
+ArchiveOrderDescending: true
+ArchiveDestination: >
+  => GetInt("Index") <= 1 ? $"posts/index.html" : $"posts/page/{GetInt("Index")}.html"
+ArchiveTitle: => GetString("Title")
+---
+@foreach(IGrouping<int, IDocument> group in Document
+                                            .GetChildren()
+                                            .GroupBy(x => x.GetDateTime(WebKeys.Published).Year)
+                                            .OrderByDescending(x => x.Key))
+{
+  <h2 class="year-heading">@group.Key</h2>
+  foreach (IDocument post in group)
+  {
+    <div class="post-preview">
+      <h3>@Html.DocumentLink(post)</h3>
+      @if(post.ContainsKey("Lead"))
+      {
+        <div class="post-subtitle">@post.GetString("Lead")</div>
+      }
+      <p class="post-meta">Published on @post.GetDateTime(WebKeys.Published).ToLongDateString(Context)</p>
+    </div>
+  }
+}
+
+@{
+  IDocument newer = Model.GetDocument(Keys.Previous);
+  IDocument older = Model.GetDocument(Keys.Next);
+}
+@if (older != null || newer != null)
+{
+  <div class="pagination">
+    <div>
+      @if (newer != null)
+      {
+        <a href="@Context.GetLink(newer)">&laquo; Newer</a>
+      }
+    </div>
+    <div>
+      @if (older != null)
+      {
+        <a href="@Context.GetLink(older)">Older &raquo;</a>
+      }
+    </div>
+  </div>
+}
