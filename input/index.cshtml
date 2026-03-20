@@ -1,0 +1,36 @@
+Description: => Context.GetString("SiteDescription")
+ArchiveSources: => GetString("PostSources")
+ArchiveFilter: => GetBool("IsPost")
+ArchiveDestination: >
+  => GetInt("Index") <= 1 ? $"index.html" : $"page/{GetInt("Index")}.html"
+ArchivePageSize: 5
+ArchiveOrderKey: Published
+ArchiveOrderDescending: true
+ArchiveTitle: => GetString("Title")
+---
+<div class="two-col">
+  <div>
+    @Html.Partial("/_posts.cshtml", Document)
+  </div>
+  <div class="sidebar">
+    @{
+      IDocument[] tags = Outputs.Get("tags/index.html")?.GetChildren().OrderByDescending(x => x.GetChildren().Count()).Take(10).ToArray() ?? Array.Empty<IDocument>();
+      if (tags.Length > 0)
+      {
+        <div>
+          <h5>Tags</h5>
+          @foreach (IDocument tag in tags)
+          {
+            string postCount = tag.GetChildren().Count().ToString();
+            <a href="@Context.GetLink(tag)" class="badge"> @tag.GetTitle() (@postCount)</a>
+          }
+          <div class="mt-3">
+            <a href='@Context.GetLink(Outputs.Get("tags/index.html"))'>All Tags &raquo;</a>
+          </div>
+        </div>
+      }
+    }
+
+    @Html.Partial("/_sidebar.cshtml")
+  </div>
+</div>
